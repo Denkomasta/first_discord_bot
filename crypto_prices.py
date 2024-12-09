@@ -10,6 +10,7 @@ token = os.getenv("DISCORD_TOKEN")
 
 # Create bot instance
 intents = discord.Intents.default()
+intents.message_content = True
 bot = commands.Bot(command_prefix='-', intents=intents)
 
 # Event: On bot ready
@@ -18,12 +19,18 @@ async def on_ready():
     print(f'{bot.user} has connected to Discord!')
 
 # ctx == discord context
-# command @hello
+# command hello
 @bot.command(name='hello', help='Replies with Hello!')
 async def hello(ctx):
     await ctx.send(f'Hello, {ctx.author}!')
 
-# Command to fetch cryptocurrency price - command @price
+# ping command
+@bot.command(name='ping')
+async def ping(ctx):
+    print("Ping command was triggered!")
+    await ctx.send("Pong!")
+
+# Command to fetch cryptocurrency price - command price
 @bot.command(name='price')
 async def crypto_price(ctx, symbol: str):
     """
@@ -44,5 +51,14 @@ async def crypto_price(ctx, symbol: str):
     except Exception as e:
         await ctx.send("An error occurred while fetching the price. Please try again later.")
         print(f"Error: {e}")
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    print("Got message")
+    print(message)
+    await bot.process_commands(message)
 
 bot.run(token)  #token from .env file
