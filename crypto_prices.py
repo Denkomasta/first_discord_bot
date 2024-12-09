@@ -4,11 +4,26 @@ import requests
 from dotenv import load_dotenv
 import os
 
+# Loads private discord bot token from .env
+load_dotenv()
+token = os.getenv("DISCORD_TOKEN")
+
 # Create bot instance
 intents = discord.Intents.default()
-bot = commands.Bot(command_prefix='@', intents=intents)
+bot = commands.Bot(command_prefix='-', intents=intents)
 
-# Command to fetch cryptocurrency price
+# Event: On bot ready
+@bot.event
+async def on_ready():
+    print(f'{bot.user} has connected to Discord!')
+
+# ctx == discord context
+# command @hello
+@bot.command(name='hello', help='Replies with Hello!')
+async def hello(ctx):
+    await ctx.send(f'Hello, {ctx.author}!')
+
+# Command to fetch cryptocurrency price - command @price
 @bot.command(name='price')
 async def crypto_price(ctx, symbol: str):
     """
@@ -30,6 +45,4 @@ async def crypto_price(ctx, symbol: str):
         await ctx.send("An error occurred while fetching the price. Please try again later.")
         print(f"Error: {e}")
 
-load_dotenv()
-token = os.getenv("DISCORD_TOKEN")
-bot.run(token)
+bot.run(token)  #token from .env file
