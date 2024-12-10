@@ -57,8 +57,6 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    print("Got message")
-    print(message)
     await bot.process_commands(message)
 
 bot.run(token)  #token from .env file
