@@ -57,6 +57,9 @@ class Database:
     
     def register(self, author_id: int) -> None:
         self.data[str(author_id)] = {}
+    
+    def delete(self, author_id: int) -> None:
+        self.data.pop(str(author_id))
 
     def is_registered(self, author_id: int) -> bool:
         return str(author_id) in self.data.keys()
@@ -64,12 +67,11 @@ class Database:
     def get_portfolio(self, author_id: int) -> dict[str, dict[str, float]]:
         return self.data.get(str(author_id), {})
 
-    def add_cryptocurrency(self, author_id: int, currency: str, amount: float, buy_price: float) -> bool:
+    def add_cryptocurrency(self, author_id: int, currency: str, amount: float) -> bool:
         c_low = currency.lower()
         if c_low in self.crypto_values.keys():
             self.data[str(author_id)][c_low] = {
-                "amount": amount,
-                "buy_price": buy_price,
+                "amount": amount
             }
             return True
 
@@ -88,7 +90,6 @@ class Database:
 
             self.data[str(author_id)][c_low] = {
                 "amount": amount,
-                "buy_price": buy_price,
             }
             return True
         except requests.exceptions.RequestException as e:

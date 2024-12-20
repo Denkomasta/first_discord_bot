@@ -79,11 +79,11 @@ async def portfolio(ctx):
 
     await ctx.send(portfolio_summary)
 
-@bot.command(name='p_add', help=f'Add new cryptocurrency to your portfolio ({CMD_PREFIX}p_add [currency] [amount] [buy_price])!')
-async def p_add(ctx, currency: str = None, amount: str = None, buy_price: str = None):
+@bot.command(name='p_add', help=f'Add new cryptocurrency to your portfolio ({CMD_PREFIX}p_add [currency] [amount])!')
+async def p_add(ctx, currency: str = None, amount: str = None):
     sender = ctx.author
-    if currency is None or amount is None or buy_price is None:
-        await ctx.send(f'{sender.mention}, please specify currency amount buy_price like: `{CMD_PREFIX}p_add bitcoin 2 65000`')
+    if currency is None or amount is None:
+        await ctx.send(f'{sender.mention}, please specify currency amount like: `{CMD_PREFIX}p_add bitcoin 2`')
         return
     
     try:
@@ -92,16 +92,32 @@ async def p_add(ctx, currency: str = None, amount: str = None, buy_price: str = 
         await ctx.send(f'{sender.mention}, the amount must be a valid number.')
         return
 
-    try:
-        price = float(buy_price)
-    except ValueError:
-        await ctx.send(f'{sender.mention}, the buy_price must be a valid number.')
-        return
-
-    if Data.add_cryptocurrency(sender.id, currency, amount, price):
+    if Data.add_cryptocurrency(sender.id, currency, amount):
         await ctx.send(f'{currency.upper()} added to your portfolio.')
         return
     await ctx.send(f'{sender.mention}, the currency must be a valid crypto symbol.')
+
+@bot.command(name='p_change', help=f'Change amount of coins of your cryptocurrency ({CMD_PREFIX}p_change [currency] [amount])!')
+async def p_change(ctx, currency: str = None, amount: str = None):
+    sender = ctx.author
+    if currency is None or amount is None:
+        await ctx.send(f'{sender.mention}, please specify currency amount like: `{CMD_PREFIX}p_change bitcoin 2`')
+        return
+    
+    try:
+        amount = float(amount)
+    except ValueError:
+        await ctx.send(f'{sender.mention}, the amount must be a valid number.')
+        return
+
+    Data.update_coins(sender.id, currency, amount)
+    await ctx.send(f'{currency.upper()} added to your portfolio.')
+
+@bot.command(name='delete_account', help='Delete your account :(')
+async def delete(ctx):
+    user_id = ctx.author.id
+    Data.delete(user_id)
+    await ctx.send(f"{ctx.author.mention}, your account has been deleted!")
 
 @bot.event
 async def on_message(message):
